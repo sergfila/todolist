@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {useCallback} from 'react';
 import './App.css';
 import {TaskType, TodolistWithRedux} from './TodolistWithRedux';
-import {AddItemForm} from "./AddItemForm";
+import AddItemForm from "./AddItemForm";
 import ButtonAppBar from "./AppBar";
 import Paper from '@mui/material/Paper';
 import {
@@ -17,16 +17,16 @@ export type TasksType = {
 }
 
 function AppWithRedux() {
-
+    console.log('AppRedux render')
     let state = useSelector<AppRootStateType, Array<TodolistsType>>(state => state.todolists)
 
     const dispatch = useDispatch()
 
     // добавление тудулиста
-    function addTodolist(title: string) {
+    const addTodolist = useCallback ((title: string) => {
         let action = addTodolistAC(title)
         dispatch(action)
-    }
+    }, [])
 
     return (
         <div className="App">

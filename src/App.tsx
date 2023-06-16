@@ -1,8 +1,8 @@
-import React, {useState} from 'react';
+import React, {useCallback, useState} from 'react';
 import './App.css';
 import {TaskType, Todolist} from './Todolist';
 import {v1} from 'uuid';
-import {AddItemForm} from "./AddItemForm";
+import AddItemForm from "./AddItemForm";
 import ButtonAppBar from "./AppBar";
 import Paper from '@mui/material/Paper';
 
@@ -13,6 +13,8 @@ export type TasksType = {
 }
 
 function App() {
+    console.log('App render')
+
     let todolistID1 = v1();
     let todolistID2 = v1();
 
@@ -20,7 +22,6 @@ function App() {
         {id: todolistID1, title: 'What to learn', filter: 'all'},
         {id: todolistID2, title: 'What to buy', filter: 'all'},
     ])
-
     let [tasks, setTasks] = useState<TasksType>({
         [todolistID1]: [
             {id: v1(), title: "HTML&CSS", isDone: true},
@@ -39,42 +40,42 @@ function App() {
     });
 
     // удаление таски
-    function removeTask(todolistID: string, taskID: string) {
+    const removeTask = useCallback((todolistID: string, taskID: string) => {
         setTasks({...tasks, [todolistID]: tasks[todolistID].filter(el => el.id !== taskID)})
-    }
+    }, [tasks])
     // добавление таски
-    function addTask(todolistID: string, title: string) {
+    const addTask = useCallback((todolistID: string, title: string) => {
         let task = {id: v1(), title: title, isDone: false};
         setTasks({...tasks, [todolistID]: [task,...tasks[todolistID]]})
-    }
+    }, [tasks])
     // смена чекбокса
-    function changeStatus(todolistID: string,taskId: string, isDone: boolean) {
+    const changeStatus = useCallback((todolistID: string,taskId: string, isDone: boolean) => {
         setTasks({...tasks, [todolistID]: tasks[todolistID].map(el => el.id === taskId ? {...el, isDone} : el)})
-    }
+    }, [tasks])
     // смена фильтра тасок
-    function changeFilter(todolistID: string, value: FilterValuesType) {
+    const changeFilter = useCallback((todolistID: string, value: FilterValuesType) => {
         setTodolists(todolists.map(el => el.id === todolistID ? {...el, filter: value} : el))
-    }
+    }, [todolists])
     // удаление тудулиста
-    function removeTodolist(todolistID: string) {
+    const removeTodolist = useCallback((todolistID: string) => {
         setTodolists(todolists.filter(el => el.id !== todolistID))
         delete tasks[todolistID]
-    }
+    }, [todolists])
     // добавление тудулиста
-    function addTodolist(title: string) {
+    const addTodolist = useCallback((title: string) => {
         const todolist:TodolistsType = {id: v1(), title, filter: 'all'}
         setTodolists([todolist, ...todolists])
         setTasks({...tasks,[todolist.id]: []})
-    }
-
-    function changeTaskTitle(todolistID: string, taskID: string, title: string) {
+    }, [todolists])
+    // изменение имени таски
+    const changeTaskTitle = useCallback((todolistID: string, taskID: string, title: string) => {
         setTasks({...tasks, [todolistID]: tasks[todolistID]
                 .map(el => el.id === taskID ? {...el, title} : el)})
-    }
-
-    function changeTodolistTitle(todolistID: string, title: string) {
+    }, [tasks])
+    // изменение имени тудулиста
+    const changeTodolistTitle = useCallback((todolistID: string, title: string) => {
         setTodolists(todolists.map(el => el.id === todolistID ? {...el, title} : el))
-    }
+    }, [todolists])
 
     return (
         <div className="App">
@@ -88,12 +89,6 @@ function App() {
                 {todolists.map(el => {
                     let tasksForTodolist = tasks[el.id];
 
-                    if (el.filter === "active") {
-                        tasksForTodolist = tasks[el.id].filter(t => !t.isDone);
-                    }
-                    if (el.filter === "completed") {
-                        tasksForTodolist = tasks[el.id].filter(t => t.isDone);
-                    }
                     return (
                         <Paper key={el.id} elevation={2} style={{padding: '15px'}}>
                             <Todolist

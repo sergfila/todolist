@@ -1,14 +1,37 @@
-import React, {ChangeEvent, KeyboardEvent, useState} from "react";
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
+import type {Meta, StoryObj} from '@storybook/react';
+import AddItemForm from './AddItemForm';
+import React, { ChangeEvent, KeyboardEvent, useState } from "react";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
 
-export type AddItemPropsType = {
-    addItem: (title: string) => void
+const meta: Meta<typeof AddItemForm> = {
+    title: 'Components/AddItemForm',
+    component: AddItemForm,
+    tags: ['autodocs'],
+    argTypes: {
+        addItem: {
+            description: 'Button clicked inside form',
+            action: 'clicked'
+        }
+    }
+};
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const NotError: Story = {
+    args: {
+
+    }
 }
-export const AddItemForm = React.memo ((props: AddItemPropsType) => {
-    console.log('addItemForm render')
-    let [title, setTitle] = useState("")
-    let [error, setError] = useState<string | null>(null)
+
+type ErrorProps = {
+    addItem: (title: string) => void;
+}
+
+const ErrorContent: React.FC<ErrorProps> = ({ addItem }) => {
+    const [title, setTitle] = useState('');
+    const [error, setError] = useState<string | null>('Title is required');
 
     const onChangeHandler = (e: ChangeEvent<HTMLInputElement>) => {
         setTitle(e.currentTarget.value)
@@ -23,7 +46,7 @@ export const AddItemForm = React.memo ((props: AddItemPropsType) => {
     }
     const addTask = () => {
         if (title.trim() !== "") {
-            props.addItem(title.trim());
+            addItem(title.trim());
             setTitle("");
         } else {
             setError("Title is required");
@@ -51,7 +74,13 @@ export const AddItemForm = React.memo ((props: AddItemPropsType) => {
             />
             <Button style={miStules} variant="contained" onClick={addTask}>+</Button>
         </div>
-    )
-})
+    );
+}
 
-export default AddItemForm;
+export const Error: Story = {
+    render: (args) => {
+        return (
+            <ErrorContent addItem={args.addItem} />
+        );
+    }
+}

@@ -5,7 +5,8 @@ type EditableSpanPropsType = {
     onChange: (newValue: string) => void
 }
 
-export function EditableSpan(props: EditableSpanPropsType) {
+export const EditableSpan = React.memo((props: EditableSpanPropsType) => {
+    console.log('EditableSpan render')
 
     const [editMode, setEditMode] = useState<boolean>(true)
     const [title, setTitle] = useState<string>('')
@@ -29,4 +30,4 @@ export function EditableSpan(props: EditableSpanPropsType) {
                 onBlur={changeMode}
                 />
     )
-}
+})
